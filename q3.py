@@ -170,7 +170,7 @@ class q3_cam():
     #fd.seek(0, 0)  # From the beggining of file
     fd.seek(0, 2)  # From the end of file
     old_inode = os.stat(file).st_ino
-    print(old_inode)
+    #print(old_inode)
     while True:
       line_buffer = fd.readlines()
       if len(line_buffer) == 0:
