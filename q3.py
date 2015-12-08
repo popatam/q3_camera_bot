@@ -79,7 +79,7 @@ class q3_cam():
       for bot_name, player in self.bots_dict.items():
         if entered_player == bot_name:
           print('going spec')  # delme later
-          time.sleep(1.5)
+          time.sleep(2)
           player_escaped = re.sub(r'\^\d', '', player)
           self.bash('screen -S', bot_name, '-X stuff', '"\\TEAM s \n"')  # go to spectators
           self.bash('screen -S', bot_name, '-X stuff', '"\\FOLLOW', player_escaped,
@@ -165,38 +165,33 @@ class q3_cam():
     else:
       pass
 
-  def tail(self, file):
-    fd = open(file, mode='r')
-    #fd.seek(0, 0)  # From the beggining of file
-    fd.seek(0, 2)  # From the end of file
-    old_inode = os.stat(file).st_ino
-    #print(old_inode)
-    while True:
-      line_buffer = fd.readlines()
-      if len(line_buffer) == 0:
-        try:
-          new_inode = os.stat(file).st_ino
-          if new_inode != old_inode:
-            fd = open(file, mode='r')
-            old_inode = os.stat(file)
-          else:
-            pass
-        except Exception as e:
-          print(e)
-        time.sleep(0.5)
-      else:
-        for line in line_buffer:
-          yield line
-
 
 if __name__ == '__main__':
   q3 = q3_cam()
-  lines_gen = q3.tail(q3.q3_log)
-  for line in lines_gen:
-    q3.connected(line)
-    q3.entered(line)
-    q3.disconnected(line)
-    q3.ready(line)
-    q3.warmup(line)
-    q3.dropped(line)
-    q3.timed(line)
+  file = q3.q3_log
+  fd = open(file, mode='r')
+  #fd.seek(0, 0)  # From the beggining of file
+  fd.seek(0, 2)  # From the end of file
+  old_inode = os.stat(file).st_ino
+  while True:
+    line_buffer = fd.readlines()
+    if len(line_buffer) == 0:
+      try:
+        new_inode = os.stat(file).st_ino
+        if new_inode != old_inode:
+          fd = open(file, mode='r')
+          old_inode = os.stat(file)
+        else:
+          pass
+      except Exception as e:
+        print(e)
+      time.sleep(0.5)
+    else:
+      for line in line_buffer:
+        q3.connected(line)
+        q3.entered(line)
+        q3.disconnected(line)
+        q3.ready(line)
+        q3.warmup(line)
+        q3.dropped(line)
+        q3.timed(line)
